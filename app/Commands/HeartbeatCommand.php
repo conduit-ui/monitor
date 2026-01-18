@@ -13,6 +13,7 @@ class HeartbeatCommand extends Command
     protected $signature = 'heartbeat
                             {--endpoint= : URL to POST heartbeat to}
                             {--token= : Bearer token for auth}
+                            {--log= : Append to JSONL file for local event sourcing}
                             {--silent : Suppress output}';
 
     protected $description = 'Send system heartbeat to configured endpoint';
@@ -25,13 +26,25 @@ class HeartbeatCommand extends Command
         $stats['alerts'] = $this->detectAlerts($stats);
         $stats['status'] = empty($stats['alerts']) ? 'healthy' : 'warning';
 
+        if ($logFile = $this->option('log')) {
+            $dir = dirname($logFile);
+            if (! is_dir($dir)) {
+                mkdir($dir, 0755, true);
+            }
+            file_put_contents($logFile, json_encode($stats)."\n", FILE_APPEND | LOCK_EX);
+            if (! $this->option('silent')) {
+                $this->info("Heartbeat logged to {$logFile}");
+            }
+        }
+
         $endpoint = $this->option('endpoint') ?? config('monitor.heartbeat_endpoint');
 
         if (! $endpoint) {
-            if (! $this->option('quiet')) {
+            if (! $this->option('silent')) {
                 $this->warn('No endpoint configured. Use --endpoint or set MONITOR_HEARTBEAT_ENDPOINT');
                 $this->line(json_encode($stats, JSON_PRETTY_PRINT));
             }
+
             return self::SUCCESS;
         }
 
@@ -45,17 +58,20 @@ class HeartbeatCommand extends Command
             $response = $request->post($endpoint, $stats);
 
             if ($response->successful()) {
-                if (! $this->option('quiet')) {
+                if (! $this->option('silent')) {
                     $this->info("Heartbeat sent to {$endpoint}");
                 }
+
                 return self::SUCCESS;
             }
 
             $this->error("Heartbeat failed: {$response->status()}");
+
             return self::FAILURE;
 
         } catch (\Exception $e) {
             $this->error("Heartbeat failed: {$e->getMessage()}");
+
             return self::FAILURE;
         }
     }
