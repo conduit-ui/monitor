@@ -1,18 +1,22 @@
 {
-    "name": "laravel-zero/laravel-zero",
-    "description": "The Laravel Zero Framework.",
-    "keywords": ["framework", "laravel", "laravel zero", "console", "cli"],
-    "homepage": "https://laravel-zero.com",
+    "name": "conduit-ui/monitor",
+    "description": "Monitoring CLI for the Conduit agent ecosystem",
+    "keywords": [
+        "cli",
+        "monitor",
+        "conduit-ui"
+    ],
+    "homepage": "https://github.com/conduit-ui/monitor",
     "type": "project",
     "license": "MIT",
     "support": {
-        "issues": "https://github.com/laravel-zero/laravel-zero/issues",
-        "source": "https://github.com/laravel-zero/laravel-zero"
+        "issues": "https://github.com/conduit-ui/monitor/issues",
+        "source": "https://github.com/conduit-ui/monitor"
     },
     "authors": [
         {
-            "name": "Nuno Maduro",
-            "email": "enunomaduro@gmail.com"
+            "name": "Jordan Partridge",
+            "email": "jordan@partridge.rocks"
         }
     ],
     "require": {
@@ -46,5 +50,7 @@
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
-    "bin": ["monitor"]
+    "bin": [
+        "monitor"
+    ]
 }
